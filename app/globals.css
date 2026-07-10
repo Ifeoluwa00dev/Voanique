@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --color-platine: #FFFFFF;
+  --color-mist: #F1F2F2;
+  --color-argent: #929497;
+  --color-graphite: #414042;
+  --color-onyx: #000000;
+}
+
+@theme inline {
+  --color-platine: var(--color-platine);
+  --color-mist: var(--color-mist);
+  --color-argent: var(--color-argent);
+  --color-graphite: var(--color-graphite);
+  --color-onyx: var(--color-onyx);
+
+  --font-serif: var(--font-montserrat), Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-montserrat), Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-montserrat), monospace;
+}
+
+@keyframes slide-down {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.animate-slide-down {
+  animation: slide-down 2s ease-in-out infinite;
+}
+
+body {
+  background: var(--color-platine);
+  color: var(--color-onyx);
+}
