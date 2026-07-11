@@ -4,9 +4,8 @@ import React, { useEffect, useRef, useState, FormEvent } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Sun, Moon } from "lucide-react";
 
-// Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
@@ -15,242 +14,167 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
-  // Refs for GSAP animations
-  const heroRef = useRef<HTMLDivElement>(null);
-  const heroBgRef = useRef<HTMLDivElement>(null);
+  // Horizontal scroll container refs
+  const pinWrapRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const panelRefs = useRef<HTMLDivElement[]>([]);
+
+  const addPanelRef = (el: HTMLDivElement | null) => {
+    if (el && !panelRefs.current.includes(el)) panelRefs.current.push(el);
+  };
+
+  // Hero-specific refs (panel 1)
   const wordmarkRef = useRef<HTMLDivElement>(null);
   const hairlineRef = useRef<HTMLDivElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
-  const taglineSubRef = useRef<HTMLParagraphElement>(null);
+  const scrollCueRef = useRef<HTMLDivElement>(null);
 
-  const qaSectionRef = useRef<HTMLDivElement>(null);
-  const qaTitleRef = useRef<HTMLDivElement>(null);
-  const qaItemRefs = useRef<HTMLDivElement[]>([]);
+  // Door text refs (panels 2–6) for in-panel reveal
+  const doorOneEyebrowRef = useRef<HTMLDivElement>(null);
+  const doorOneTitleRef = useRef<HTMLHeadingElement>(null);
+  const doorOneLineRef = useRef<HTMLParagraphElement>(null);
 
-  const brandStatementRef = useRef<HTMLDivElement>(null);
+  const doorTwoEyebrowRef = useRef<HTMLDivElement>(null);
+  const doorTwoTitleRef = useRef<HTMLHeadingElement>(null);
+  const doorTwoLineRef = useRef<HTMLParagraphElement>(null);
 
-  const proofSectionRef = useRef<HTMLDivElement>(null);
-  const proofTextRef = useRef<HTMLHeadingElement>(null);
+  const doorThreeEyebrowRef = useRef<HTMLDivElement>(null);
+  const doorThreeTitleRef = useRef<HTMLHeadingElement>(null);
+  const doorThreeLineRef = useRef<HTMLParagraphElement>(null);
+  const doorThreeImageRef = useRef<HTMLDivElement>(null);
 
-  const tagsSectionRef = useRef<HTMLDivElement>(null);
-  const tagRefs = useRef<HTMLDivElement[]>([]);
+  const doorFourTextRef = useRef<HTMLHeadingElement>(null);
 
-  const askSectionRef = useRef<HTMLDivElement>(null);
+  const doorFiveEyebrowRef = useRef<HTMLDivElement>(null);
+  const doorFiveTitleRef = useRef<HTMLHeadingElement>(null);
   const successSectionRef = useRef<HTMLDivElement>(null);
-
-  const addToQaRefs = (el: HTMLDivElement | null) => {
-    if (el && !qaItemRefs.current.includes(el)) {
-      qaItemRefs.current.push(el);
-    }
-  };
-
-  const addToTagRefs = (el: HTMLDivElement | null) => {
-    if (el && !tagRefs.current.includes(el)) {
-      tagRefs.current.push(el);
-    }
-  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const wordmarkChars =
-        wordmarkRef.current?.querySelectorAll(".wordmark-char");
-      if (wordmarkChars && wordmarkChars.length > 0) {
-        gsap.fromTo(
-          wordmarkChars,
-          { yPercent: 105, opacity: 0 },
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: 1.4,
-            ease: "power3.out",
-            stagger: 0.08,
-          }
-        );
-      }
+      const panels = panelRefs.current;
+      const track = trackRef.current;
+      const pinWrap = pinWrapRef.current;
 
-      if (hairlineRef.current) {
-        gsap.fromTo(
-          hairlineRef.current,
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            duration: 1.8,
-            ease: "power2.inOut",
-            delay: 0.8,
-          }
-        );
-      }
+      if (track && pinWrap && panels.length > 0) {
+        const totalPanels = panels.length;
 
-      if (taglineRef.current) {
-        gsap.fromTo(
-          taglineRef.current,
-          { opacity: 0, y: 15 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            ease: "power2.out",
-            delay: 1.3,
-          }
-        );
-      }
-
-      if (taglineSubRef.current) {
-        gsap.fromTo(
-          taglineSubRef.current,
-          { opacity: 0, y: 10 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.0,
-            ease: "power2.out",
-            delay: 1.9,
-          }
-        );
-      }
-
-      if (heroBgRef.current && heroRef.current) {
-        gsap.to(heroBgRef.current, {
-          yPercent: 12,
+        // Horizontal scroll-jack: vertical scroll drives xPercent on the track.
+        // The user still scrolls normally (wheel or touch) — this works on
+        // mobile without special gesture handling, since it's driven by
+        // document scroll position, not raw input events.
+        const horizontalTween = gsap.to(track, {
+          xPercent: -100 * (totalPanels - 1),
           ease: "none",
           scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
+            trigger: pinWrap,
+            pin: true,
+            scrub: 1,
+            end: () => "+=" + (track.scrollWidth - window.innerWidth),
+            invalidateOnRefresh: true,
           },
         });
-      }
 
-      if (qaSectionRef.current) {
-        if (qaTitleRef.current) {
+        // Per-panel reveal, tied to the same horizontal scroll progress
+        const revealInPanel = (parts: (HTMLElement | null)[], panelEl: HTMLElement) => {
+          const els = parts.filter(Boolean) as HTMLElement[];
+          if (els.length === 0) return;
           gsap.fromTo(
-            qaTitleRef.current,
-            { opacity: 0, y: 10 },
+            els,
+            { opacity: 0, y: 28 },
             {
               opacity: 1,
               y: 0,
-              duration: 0.8,
-              scrollTrigger: {
-                trigger: qaSectionRef.current,
-                start: "top 85%",
-                toggleActions: "play none none none",
-              },
-            }
-          );
-        }
-
-        if (qaItemRefs.current.length > 0) {
-          gsap.fromTo(
-            qaItemRefs.current,
-            { opacity: 0, y: 25 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1.0,
-              stagger: 0.15,
+              duration: 1,
+              stagger: 0.2,
               ease: "power2.out",
               scrollTrigger: {
-                trigger: qaSectionRef.current,
-                start: "top 75%",
-                toggleActions: "play none none none",
+                trigger: panelEl,
+                containerAnimation: horizontalTween,
+                start: "left 65%",
+                toggleActions: "play none none reverse",
               },
             }
           );
-        }
-      }
+        };
 
-      if (brandStatementRef.current) {
-        gsap.fromTo(
-          brandStatementRef.current,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: brandStatementRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      }
-
-      if (proofSectionRef.current) {
-        gsap.fromTo(
-          proofSectionRef.current,
-          { backgroundColor: "rgba(23, 24, 26, 0)", opacity: 0.8 },
-          {
-            backgroundColor: "rgba(23, 24, 26, 1)",
-            opacity: 1,
-            duration: 1.6,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: proofSectionRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-
-        if (proofTextRef.current) {
+        // Hero (panel index 0)
+        const wordmarkChars = wordmarkRef.current?.querySelectorAll(".wordmark-char");
+        if (wordmarkChars && wordmarkChars.length > 0) {
           gsap.fromTo(
-            proofTextRef.current,
-            { opacity: 0, y: 30, letterSpacing: "-0.02em" },
+            wordmarkChars,
+            { yPercent: 105, opacity: 0 },
+            { yPercent: 0, opacity: 1, duration: 1.2, ease: "power3.out", stagger: 0.06 }
+          );
+        }
+        if (hairlineRef.current) {
+          gsap.fromTo(
+            hairlineRef.current,
+            { scaleX: 0 },
+            { scaleX: 1, duration: 1.6, ease: "power2.inOut", delay: 0.6 }
+          );
+        }
+        if (taglineRef.current) {
+          gsap.fromTo(
+            taglineRef.current,
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 1.1, ease: "power2.out", delay: 1.1 }
+          );
+        }
+        if (scrollCueRef.current) {
+          gsap.fromTo(
+            scrollCueRef.current,
+            { opacity: 0 },
+            { opacity: 1, duration: 1.1, ease: "power2.out", delay: 1.9 }
+          );
+        }
+
+        // Doors (panels 1–5)
+        if (panels[1]) revealInPanel([doorOneEyebrowRef.current, doorOneTitleRef.current, doorOneLineRef.current], panels[1]);
+        if (panels[2]) revealInPanel([doorTwoEyebrowRef.current, doorTwoTitleRef.current, doorTwoLineRef.current], panels[2]);
+        if (panels[3]) {
+          revealInPanel([doorThreeEyebrowRef.current, doorThreeTitleRef.current, doorThreeLineRef.current], panels[3]);
+          if (doorThreeImageRef.current) {
+            gsap.fromTo(
+              doorThreeImageRef.current,
+              { opacity: 0, scale: 0.96 },
+              {
+                opacity: 1,
+                scale: 1,
+                duration: 1.1,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: panels[3],
+                  containerAnimation: horizontalTween,
+                  start: "left 65%",
+                  toggleActions: "play none none reverse",
+                },
+              }
+            );
+          }
+        }
+        if (panels[4] && doorFourTextRef.current) {
+          gsap.fromTo(
+            doorFourTextRef.current,
+            { opacity: 0, y: 30 },
             {
               opacity: 1,
               y: 0,
-              letterSpacing: "0em",
-              duration: 1.4,
-              delay: 0.2,
+              duration: 1.2,
               ease: "power2.out",
               scrollTrigger: {
-                trigger: proofSectionRef.current,
-                start: "top 80%",
-                toggleActions: "play none none none",
+                trigger: panels[4],
+                containerAnimation: horizontalTween,
+                start: "left 65%",
+                toggleActions: "play none none reverse",
               },
             }
           );
         }
+        if (panels[5]) revealInPanel([doorFiveEyebrowRef.current, doorFiveTitleRef.current], panels[5]);
       }
-
-      if (tagsSectionRef.current && tagRefs.current.length > 0) {
-        gsap.fromTo(
-          tagRefs.current,
-          { opacity: 0, y: 15, scale: 0.98 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.12,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: tagsSectionRef.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      }
-
-      if (askSectionRef.current) {
-        gsap.fromTo(
-          askSectionRef.current,
-          { opacity: 0, y: 15 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.1,
-            ease: "power2.out",
-            delay: 2.4,
-          }
-        );
-      }
-    }, heroRef);
+    }, pinWrapRef);
 
     return () => ctx.revert();
   }, []);
@@ -271,9 +195,7 @@ export default function Home() {
     try {
       const response = await fetch("/api/waitlist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
       });
 
@@ -292,6 +214,8 @@ export default function Home() {
             );
           }
         }, 50);
+        // Refresh ScrollTrigger since panel content height may have changed
+        setTimeout(() => ScrollTrigger.refresh(), 150);
       } else {
         setError(data.error || "An error occurred. Please try again.");
       }
@@ -303,123 +227,213 @@ export default function Home() {
     }
   };
 
-  const questions = [
-    { q: "WHO ARE WE?", a: "VOANIQUÉ." },
-    {
-      q: "WHAT DO WE DO?",
-      a: "A premium lip plumper. Fuller-looking lips in 10 minutes.",
-    },
-    {
-      q: "WHY IS IT DIFFERENT?",
-      a: "Real formulation. Real ingredients. No injections.",
-    },
-    {
-      q: "CAN I TRUST THE BRAND?",
-      a: "Real photography. Honest ingredients. Nothing hidden.",
-    },
-    { q: "WHAT SHOULD I DO NOW?", a: "Join Early Access." },
-  ];
+  const bg = isDark ? "bg-onyx" : "bg-platine";
+  const text = isDark ? "text-platine" : "text-onyx";
+  const border = "border-argent border-opacity-20";
 
   return (
-    <div className="min-h-screen bg-platine text-onyx selection:bg-onyx selection:text-platine relative flex flex-col font-sans">
-      {/* 1. HERO SECTION */}
-      <section
-        id="hero"
-        ref={heroRef}
-        className="relative h-screen min-h-[650px] w-full flex flex-col items-center justify-between overflow-hidden px-6 pt-16 pb-12 md:pb-20"
-      >
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <div
-            ref={heroBgRef}
-            className="absolute -top-[10%] left-0 w-full h-[120%] opacity-90 transition-opacity duration-1000"
-            style={{
-              backgroundImage:
-  "linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1631237534324-4b961b17b424?fm=jpg&q=80&w=2400&auto=format&fit=crop')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundColor: "#FAFAF9",
-            }}
-          />
-        </div>
-
-        <div className="z-10 flex flex-col items-center gap-3">
+    <div className={`min-h-screen ${bg} ${text} selection:bg-onyx selection:text-platine relative font-sans transition-colors duration-700`}>
+      {/* STICKY NAVBAR — logo + light/dark toggle pill */}
+      <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-10 py-5 pointer-events-none">
+        <div className="pointer-events-auto flex items-center gap-2">
           <Image
             src="/logo.svg"
             alt="VOANIQUÉ"
-            width={90}
-            height={36}
-            className="opacity-90"
-            priority
+            width={70}
+            height={28}
+            className={isDark ? "invert opacity-90" : "opacity-90"}
           />
-          <div className="text-[10px] uppercase tracking-[0.25em] text-graphite font-medium">
-            PRE-LAUNCH WAITLIST
-          </div>
         </div>
 
-        <div className="z-10 w-full max-w-4xl text-center flex flex-col items-center justify-center my-auto">
-          <div
-            ref={wordmarkRef}
-            className="overflow-hidden select-none mb-4 md:mb-6"
-            id="wordmark-container"
+        <button
+          type="button"
+          onClick={() => setIsDark((d) => !d)}
+          aria-label="Toggle light or dark mode"
+          className={`pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-full border ${border} ${
+            isDark ? "bg-white/5" : "bg-black/5"
+          } backdrop-blur-sm transition-colors duration-500`}
+        >
+          <Sun className={`w-3.5 h-3.5 transition-opacity duration-300 ${isDark ? "opacity-30" : "opacity-100"}`} />
+          <span
+            className={`relative inline-flex w-8 h-4 rounded-full transition-colors duration-500 ${
+              isDark ? "bg-platine/30" : "bg-onyx/20"
+            }`}
           >
-            <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-serif font-medium tracking-[0.05em] text-onyx inline-flex">
-              {"VOANIQUÉ".split("").map((char, index) => (
-                <span
-                  key={index}
-                  className="wordmark-char inline-block"
-                  style={{ display: "inline-block" }}
-                >
-                  {char}
-                </span>
-              ))}
-            </h1>
+            <span
+              className={`absolute top-0.5 w-3 h-3 rounded-full bg-current transition-transform duration-500 ${
+                isDark ? "translate-x-4" : "translate-x-0.5"
+              }`}
+            />
+          </span>
+          <Moon className={`w-3.5 h-3.5 transition-opacity duration-300 ${isDark ? "opacity-100" : "opacity-30"}`} />
+        </button>
+      </nav>
+
+      {/* HORIZONTAL SCROLL-JACKED "HALLWAY" — Hero + Five Doors */}
+      <div ref={pinWrapRef} className="relative w-full h-screen overflow-hidden">
+        <div ref={trackRef} className="flex h-full w-max will-change-transform">
+          {/* PANEL 0 — HERO */}
+          <div
+            ref={addPanelRef}
+            className="relative w-screen h-full flex-shrink-0 flex flex-col items-center justify-center px-6 overflow-hidden"
+          >
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+              <div
+                className="absolute inset-0 opacity-90"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.75)), url('https://images.unsplash.com/photo-1631237534324-4b961b17b424?fm=jpg&q=80&w=2400&auto=format&fit=crop')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            </div>
+
+            <div className="z-10 text-[10px] uppercase tracking-[0.25em] text-graphite font-medium absolute top-24">
+              THE ENTRANCE
+            </div>
+
+            <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
+              <div ref={wordmarkRef} className="overflow-hidden select-none mb-4 md:mb-6">
+                <h1 className="text-6xl sm:text-7xl md:text-8xl font-serif font-medium tracking-[0.05em] text-onyx inline-flex">
+                  {"VOANIQUÉ".split("").map((char, index) => (
+                    <span key={index} className="wordmark-char inline-block">
+                      {char}
+                    </span>
+                  ))}
+                </h1>
+              </div>
+
+              <div
+                ref={hairlineRef}
+                className="w-full max-w-sm h-[1px] bg-graphite bg-opacity-30 mb-8 scale-x-0 origin-center"
+              />
+
+              <p
+                ref={taglineRef}
+                className="text-xl sm:text-2xl md:text-3xl font-serif italic text-onyx tracking-wide opacity-0 max-w-xl"
+              >
+                A new luxury beauty house is preparing to open its doors.
+              </p>
+            </div>
+
+            <div
+              ref={scrollCueRef}
+              className="z-10 text-[10px] uppercase tracking-[0.3em] text-graphite opacity-0 absolute bottom-14 flex items-center gap-2"
+            >
+              <span>Scroll to enter</span>
+              <span className="block w-8 h-[1px] bg-graphite bg-opacity-40" />
+            </div>
           </div>
 
+          {/* PANEL 1 — DOOR ONE: The Belief */}
           <div
-            ref={hairlineRef}
-            className="w-full max-w-sm sm:max-w-md h-[1px] bg-graphite bg-opacity-30 mb-8 md:mb-10 scale-x-0 origin-center"
-          />
-
-          <p
-            ref={taglineRef}
-            className="text-xl sm:text-2xl md:text-3xl font-serif italic text-onyx tracking-wide opacity-0 mb-4"
+            ref={addPanelRef}
+            className={`w-screen h-full flex-shrink-0 flex flex-col items-center justify-center text-center px-6 border-l ${border}`}
           >
-            A new lip ritual is coming.
-          </p>
+            <div ref={doorOneEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium mb-6">
+              Door One · The Belief
+            </div>
+            <h2 ref={doorOneTitleRef} className="text-3xl sm:text-4xl md:text-5xl font-serif leading-snug max-w-xl mb-6">
+              We believe beauty is intentional.
+              <br />
+              Considered. Never rushed.
+            </h2>
+            <p ref={doorOneLineRef} className="text-sm sm:text-base text-graphite max-w-md leading-relaxed">
+              This is where the House begins — not with a product, but with a
+              belief it intends to keep.
+            </p>
+          </div>
 
-          <p
-            ref={taglineSubRef}
-            className="text-xs sm:text-sm uppercase tracking-[0.25em] text-graphite font-medium opacity-0 mb-16 md:mb-20"
+          {/* PANEL 2 — DOOR TWO: Why Lips Matter */}
+          <div
+            ref={addPanelRef}
+            className={`w-screen h-full flex-shrink-0 flex flex-col items-center justify-center text-center px-6 border-l ${border}`}
           >
-            Ten minutes. No injections.
-          </p>
+            <div ref={doorTwoEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium mb-6">
+              Door Two · Why Lips Matter
+            </div>
+            <h2 ref={doorTwoTitleRef} className="text-3xl sm:text-4xl md:text-5xl font-serif italic leading-snug max-w-xl mb-6">
+              Lips are where confidence begins.
+            </h2>
+            <p ref={doorTwoLineRef} className="text-sm sm:text-base text-graphite max-w-md leading-relaxed">
+              Where a feeling becomes visible. It's why the House chose to
+              begin exactly here.
+            </p>
+          </div>
 
-          {/* EMAIL FORM — moved into hero, directly below the tagline */}
-          <div className="w-full max-w-md mx-auto">
-            {isSubmitted ? (
-              <div
-                ref={successSectionRef}
-                className="text-center opacity-0 flex flex-col items-center justify-center py-4"
-                id="success-message"
-              >
-                <div className="w-10 h-10 rounded-full border border-onyx flex items-center justify-center mb-4">
-                  <Check className="w-4 h-4 text-onyx stroke-[1.5]" />
+          {/* PANEL 3 — DOOR THREE: The First Creation */}
+          <div
+            ref={addPanelRef}
+            className={`w-screen h-full flex-shrink-0 flex items-center justify-center px-6 md:px-16 border-l ${border}`}
+          >
+            <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16 max-w-5xl">
+              <div className="flex-1 text-center md:text-left flex flex-col gap-4">
+                <div ref={doorThreeEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
+                  Door Three · The First Creation
                 </div>
-
-                <h3 className="text-2xl sm:text-3xl font-serif text-onyx mb-3 tracking-tight">
-                  {alreadyRegistered
-                    ? "Rejoining the Ritual."
-                    : "Welcome to the Ritual."}
-                </h3>
-
-                <p className="text-sm text-graphite leading-relaxed max-w-sm mx-auto">
-                  {alreadyRegistered
-                    ? "You are already registered on the VOANIQUÉ Early Access list. Your invitation is secured, and we will let you know the moment it arrives."
-                    : "You're officially on the VOANIQUÉ Early Access list. We'll let you know the moment your invitation arrives."}
+                <h2 ref={doorThreeTitleRef} className="text-3xl sm:text-4xl md:text-5xl font-serif leading-snug">
+                  Our First Creation:
+                  <br />a luxury lip treatment.
+                </h2>
+                <p ref={doorThreeLineRef} className="text-sm sm:text-base text-graphite max-w-sm mx-auto md:mx-0 leading-relaxed">
+                  Fuller-looking lips in 10 minutes. The first door the House
+                  opens — not the last.
                 </p>
               </div>
-            ) : (
-              <div ref={askSectionRef} className="flex flex-col gap-4 opacity-0">
+              <div
+                ref={doorThreeImageRef}
+                className="flex-1 w-full max-w-[280px] md:max-w-none aspect-[4/5] rounded-sm bg-gradient-to-br from-argent/40 via-platine to-graphite/20 border border-argent border-opacity-30"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+
+          {/* PANEL 4 — DOOR FOUR: Why You Can Trust the House (dark, always) */}
+          <div
+            ref={addPanelRef}
+            className="w-screen h-full flex-shrink-0 flex flex-col items-center justify-center text-center px-6 bg-onyx text-platine"
+          >
+            <div className="text-[11px] uppercase tracking-[0.3em] text-argent font-medium mb-6">
+              Door Four · Why You Can Trust the House
+            </div>
+            <h2 ref={doorFourTextRef} className="text-3xl sm:text-4xl md:text-5xl font-light leading-tight max-w-2xl opacity-0">
+              Real photography. Honest ingredients. Nothing hidden.
+              <br />
+              <span className="font-bold">This is how the House will always work.</span>
+            </h2>
+          </div>
+
+          {/* PANEL 5 — DOOR FIVE: The Invitation */}
+          <div
+            ref={addPanelRef}
+            className={`w-screen h-full flex-shrink-0 flex flex-col items-center justify-center text-center px-6 border-l ${border}`}
+          >
+            <div className="flex flex-col items-center gap-3 mb-8">
+              <div ref={doorFiveEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
+                Door Five · The Invitation
+              </div>
+              <h2 ref={doorFiveTitleRef} className="text-3xl sm:text-4xl md:text-5xl font-serif italic">
+                Step inside.
+              </h2>
+            </div>
+
+            <div className="w-full max-w-md mx-auto">
+              {isSubmitted ? (
+                <div ref={successSectionRef} className="text-center opacity-0 flex flex-col items-center justify-center py-4">
+                  <div className="w-10 h-10 rounded-full border border-current flex items-center justify-center mb-4">
+                    <Check className="w-4 h-4 stroke-[1.5]" />
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-serif mb-3 tracking-tight">
+                    {alreadyRegistered ? "You're already inside." : "Welcome to the House."}
+                  </h3>
+                  <p className="text-sm text-graphite leading-relaxed max-w-sm mx-auto">
+                    {alreadyRegistered
+                      ? "Your invitation was already received. We'll let you know the moment the doors open."
+                      : "Your invitation has been received. We'll let you know the moment the doors open."}
+                  </p>
+                </div>
+              ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                   <div className="flex flex-col gap-2">
                     <label htmlFor="email-input" className="sr-only">
@@ -444,149 +458,33 @@ export default function Home() {
                         disabled={loading}
                         className="bg-onyx text-platine px-6 py-4 text-xs font-semibold tracking-[0.2em] transition-all duration-300 hover:bg-opacity-90 active:bg-black flex items-center justify-center gap-2 disabled:bg-opacity-50 disabled:cursor-not-allowed h-14 shrink-0"
                       >
-                        {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          "REQUEST EARLY ACCESS"
-                        )}
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "REQUEST AN INVITATION"}
                       </button>
                     </div>
-
-                    {error && (
-                      <p className="text-xs text-red-600 font-medium tracking-wide mt-1">
-                        {error}
-                      </p>
-                    )}
+                    {error && <p className="text-xs text-red-600 font-medium tracking-wide mt-1">{error}</p>}
                   </div>
-
-                  <p className="text-[10px] text-graphite leading-relaxed text-center">
-                    By joining, you consent to receive early access
-                    invitations, launch announcements, and future VOANIQUÉ
+                  <p className="text-[10px] text-graphite leading-relaxed text-center max-w-sm mx-auto">
+                    Be among the first to enter, when the House opens its
+                    doors. By joining, you consent to receive early
+                    invitations, opening announcements, and future VOANIQUÉ
                     updates. We value your privacy; unsubscribe at any time.
                   </p>
                 </form>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-
-        
-      </section>
-
-      {/* 2. THE FIVE QUESTIONS */}
-<section
-  id="questions"
-  ref={qaSectionRef}
-  className="w-full max-w-4xl mx-auto px-6 py-28 md:py-40 flex flex-col gap-16"
->
-  <div
-    ref={qaTitleRef}
-    className="text-xs font-light tracking-[0.4em] text-graphite uppercase text-center"
-  >
-    What You Should Know
-  </div>
-
-  <div className="flex flex-col">
-    {questions.map((item, index) => (
-      <div
-        key={index}
-        ref={addToQaRefs}
-        className="group grid grid-cols-[auto_1fr] md:grid-cols-[100px_1fr] gap-x-6 md:gap-x-12 items-start py-10 md:py-12 border-t border-argent border-opacity-20 last:border-b transition-opacity duration-500"
-      >
-        <span className="text-xs font-light tracking-[0.15em] text-argent pt-1">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-
-        <div className="flex flex-col gap-2 md:gap-3">
-          <span className="text-[11px] uppercase tracking-[0.2em] text-graphite font-extralight">
-            {item.q}
-          </span>
-          <h3 className="text-2xl sm:text-3xl md:text-4xl text-onyx font-semibold leading-snug group-hover:text-graphite transition-colors duration-500">
-            {item.a}
-          </h3>
         </div>
       </div>
-    ))}
-  </div>
-</section>
 
-    {/* 3. BRAND STATEMENT */}
-{/* <section
-  id="statement"
-  className="w-full bg-platine border-t border-argent border-opacity-20"
->
-  <div
-    ref={brandStatementRef}
-    className="w-full max-w-3xl mx-auto px-6 py-36 md:py-52 text-center"
-  >
-    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-snug text-onyx">
-      <span className="font-bold tracking-wide">VOANIQUÉ.</span>{" "}
-      A new name in luxury lip care, made for right here.
-    </h2>
-  </div>
-</section> */}
-
-      {/* 4. PROOF MOMENT */}
-<section
-  id="proof"
-  ref={proofSectionRef}
-  className="w-full bg-onyx text-platine overflow-hidden"
->
-  <div className="w-full max-w-4xl mx-auto px-6 py-36 md:py-48 text-center flex flex-col items-center justify-center">
-    <div className="mb-8">
-      <Image
-        src="/logo-text.png"
-        alt="VOANIQUÉ"
-        width={160}
-        height={64}
-        className="opacity-70 mx-auto brightness-0 invert"
-      />
-    </div>
-    <h2
-      ref={proofTextRef}
-      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-tight max-w-3xl opacity-0"
-    >
-      Formulated for real results.{" "}
-      <span className="font-bold">Not just a promise.</span>
-    </h2>
-  </div>
-</section>
-
-      {/* 5. DIFFERENTIATOR TAGS */}
-      {/* <section
-        id="differentiators"
-        ref={tagsSectionRef}
-        className="w-full bg-platine py-20 border-b border-argent border-opacity-25"
-      >
-        <div className="w-full max-w-4xl mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            {[
-              "Thoughtful Formulation",
-              "Considered Ingredients",
-              "Elevated Ritual",
-            ].map((tag, idx) => (
-              <div
-                key={idx}
-                ref={addToTagRefs}
-                className="px-6 py-3 rounded-full border border-argent text-onyx text-sm sm:text-base tracking-wide font-medium bg-white/40 backdrop-blur-sm shadow-xs transition-colors duration-300 hover:border-onyx hover:bg-white"
-              >
-                {tag}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* 6. FOOTER */}
-      <footer className="w-full bg-platine border-t border-argent border-opacity-20 px-6 py-12 md:py-16">
+      {/* FOOTER — reached after the horizontal hallway ends */}
+      <footer className={`w-full ${bg} border-t ${border} px-6 py-12 md:py-16 transition-colors duration-700`}>
         <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <a
             href="mailto:hello@voanique.com"
-            className="text-xs tracking-[0.2em] font-medium text-onyx hover:text-graphite transition-colors duration-300"
+            className="text-xs tracking-[0.2em] font-medium hover:text-graphite transition-colors duration-300"
           >
             hello@voanique.com
           </a>
-
           <div className="text-[10px] tracking-widest text-graphite font-light uppercase">
             © 2026 VOANIQUÉ. All Rights Reserved.
           </div>
