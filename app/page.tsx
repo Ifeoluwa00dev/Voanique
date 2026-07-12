@@ -228,9 +228,44 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen ${bg} ${text} selection:bg-onyx selection:text-platine relative flex flex-col font-sans transition-colors duration-700`}>
+      {/* MARQUEE BAR — scrolls right to left, sits above the navbar */}
+      <div
+        className={`fixed top-0 left-0 w-full z-50 overflow-hidden h-8 flex items-center ${
+          isDark ? "bg-platine text-onyx" : "bg-onyx text-platine"
+        } transition-colors duration-700`}
+      >
+        <div className="flex whitespace-nowrap animate-marquee">
+          {Array.from({ length: 2 }).map((_, groupIdx) => (
+            <div key={groupIdx} className="flex shrink-0">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="mx-12 text-[10px] uppercase tracking-[0.35em] font-medium"
+                >
+                  Where Beauty Reigns
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <style jsx>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-marquee {
+          animation: marquee 45s linear infinite;
+        }
+      `}</style>
+
       {/* STICKY NAVBAR — glassmorphism background + light/dark toggle pill */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-10 py-4 backdrop-blur-md ${
+        className={`fixed top-8 left-0 w-full z-40 flex items-center justify-between px-6 md:px-10 py-4 backdrop-blur-md ${
           isDark ? "bg-onyx/40 border-b border-white/10" : "bg-white/40 border-b border-black/5"
         } transition-colors duration-700`}
       >
@@ -272,7 +307,7 @@ export default function Home() {
       <section
         id="hero"
         ref={heroRef}
-        className="relative h-screen min-h-[650px] w-full flex flex-col items-center justify-between overflow-hidden px-6 pt-16 pb-12 md:pb-20"
+        className="relative h-screen min-h-[650px] w-full flex flex-col items-center justify-between overflow-hidden px-6 pt-24 md:pt-28 pb-12 md:pb-20"
       >
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div
@@ -289,7 +324,7 @@ export default function Home() {
 
         <div className="z-10 flex flex-col items-center gap-3">
           <div className="text-[10px] uppercase tracking-[0.25em] text-graphite font-medium">
-            
+            THE ENTRANCE
           </div>
         </div>
 
