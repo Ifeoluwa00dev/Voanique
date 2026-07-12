@@ -22,36 +22,35 @@ export default function Home() {
   const wordmarkRef = useRef<HTMLDivElement>(null);
   const hairlineRef = useRef<HTMLDivElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
-  const scrollCueRef = useRef<HTMLDivElement>(null);
+  const heroSubRef = useRef<HTMLParagraphElement>(null);
+  const heroCtaRef = useRef<HTMLDivElement>(null);
 
-  // Door One — The Belief
-  const doorOneRef = useRef<HTMLDivElement>(null);
-  const doorOneEyebrowRef = useRef<HTMLDivElement>(null);
-  const doorOneTitleRef = useRef<HTMLHeadingElement>(null);
-  const doorOneLineRef = useRef<HTMLParagraphElement>(null);
+  // Screen 2 — Our Belief
+  const beliefRef = useRef<HTMLDivElement>(null);
+  const beliefEyebrowRef = useRef<HTMLDivElement>(null);
+  const beliefTitleRef = useRef<HTMLHeadingElement>(null);
+  const beliefBodyRef = useRef<HTMLParagraphElement>(null);
 
-  // Door Two — Why Lips Matter
-  const doorTwoRef = useRef<HTMLDivElement>(null);
-  const doorTwoEyebrowRef = useRef<HTMLDivElement>(null);
-  const doorTwoTitleRef = useRef<HTMLHeadingElement>(null);
-  const doorTwoLineRef = useRef<HTMLParagraphElement>(null);
+  // Screen 3 — Why Lips
+  const whyLipsRef = useRef<HTMLDivElement>(null);
+  const whyLipsEyebrowRef = useRef<HTMLDivElement>(null);
+  const whyLipsTitleRef = useRef<HTMLHeadingElement>(null);
+  const whyLipsBodyRef = useRef<HTMLParagraphElement>(null);
 
-  // Door Three — The First Creation
-  const doorThreeRef = useRef<HTMLDivElement>(null);
-  const doorThreeEyebrowRef = useRef<HTMLDivElement>(null);
-  const doorThreeTitleRef = useRef<HTMLHeadingElement>(null);
-  const doorThreeLineRef = useRef<HTMLParagraphElement>(null);
-  const doorThreeImageRef = useRef<HTMLDivElement>(null);
+  // Screen 4 — Our First Creation
+  const firstCreationRef = useRef<HTMLDivElement>(null);
+  const firstCreationEyebrowRef = useRef<HTMLDivElement>(null);
+  const firstCreationTitleRef = useRef<HTMLHeadingElement>(null);
+  const firstCreationBodyRef = useRef<HTMLParagraphElement>(null);
+  const firstCreationImageRef = useRef<HTMLDivElement>(null);
 
-  // Door Four — Why You Can Trust the House
-  const doorFourRef = useRef<HTMLDivElement>(null);
-  const doorFourTextRef = useRef<HTMLHeadingElement>(null);
-
-  // Door Five — The Invitation
-  const doorFiveRef = useRef<HTMLDivElement>(null);
-  const doorFiveEyebrowRef = useRef<HTMLDivElement>(null);
-  const doorFiveTitleRef = useRef<HTMLHeadingElement>(null);
+  // Screen 5 — The Invitation
+  const invitationRef = useRef<HTMLDivElement>(null);
+  const invitationEyebrowRef = useRef<HTMLDivElement>(null);
+  const invitationTitleRef = useRef<HTMLHeadingElement>(null);
+  const invitationBodyRef = useRef<HTMLParagraphElement>(null);
   const successSectionRef = useRef<HTMLDivElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -77,11 +76,18 @@ export default function Home() {
           { opacity: 1, y: 0, duration: 1.2, ease: "power2.out", delay: 1.3 }
         );
       }
-      if (scrollCueRef.current) {
+      if (heroSubRef.current) {
         gsap.fromTo(
-          scrollCueRef.current,
-          { opacity: 0 },
-          { opacity: 1, duration: 1.2, ease: "power2.out", delay: 2.2 }
+          heroSubRef.current,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 1.1, ease: "power2.out", delay: 1.7 }
+        );
+      }
+      if (heroCtaRef.current) {
+        gsap.fromTo(
+          heroCtaRef.current,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 1.1, ease: "power2.out", delay: 2.1 }
         );
       }
       if (heroBgRef.current && heroRef.current) {
@@ -98,7 +104,7 @@ export default function Home() {
       }
 
       // --- Reusable reveal: fade + slight rise, nothing else ---
-      const revealDoor = (sectionEl: HTMLElement | null, parts: (HTMLElement | null)[]) => {
+      const revealScreen = (sectionEl: HTMLElement | null, parts: (HTMLElement | null)[]) => {
         const els = parts.filter(Boolean) as HTMLElement[];
         if (!sectionEl || els.length === 0) return;
         gsap.fromTo(
@@ -119,13 +125,17 @@ export default function Home() {
         );
       };
 
-      revealDoor(doorOneRef.current, [doorOneEyebrowRef.current, doorOneTitleRef.current, doorOneLineRef.current]);
-      revealDoor(doorTwoRef.current, [doorTwoEyebrowRef.current, doorTwoTitleRef.current, doorTwoLineRef.current]);
-      revealDoor(doorThreeRef.current, [doorThreeEyebrowRef.current, doorThreeTitleRef.current, doorThreeLineRef.current]);
+      revealScreen(beliefRef.current, [beliefEyebrowRef.current, beliefTitleRef.current, beliefBodyRef.current]);
+      revealScreen(whyLipsRef.current, [whyLipsEyebrowRef.current, whyLipsTitleRef.current, whyLipsBodyRef.current]);
+      revealScreen(firstCreationRef.current, [
+        firstCreationEyebrowRef.current,
+        firstCreationTitleRef.current,
+        firstCreationBodyRef.current,
+      ]);
 
-      if (doorThreeImageRef.current) {
+      if (firstCreationImageRef.current) {
         gsap.fromTo(
-          doorThreeImageRef.current,
+          firstCreationImageRef.current,
           { opacity: 0, y: 24 },
           {
             opacity: 1,
@@ -133,7 +143,7 @@ export default function Home() {
             duration: 1.2,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: doorThreeRef.current,
+              trigger: firstCreationRef.current,
               start: "top 78%",
               toggleActions: "play none none none",
             },
@@ -141,30 +151,24 @@ export default function Home() {
         );
       }
 
-      // Door Four — the single deliberate dark moment, simple fade
-      if (doorFourRef.current && doorFourTextRef.current) {
-        gsap.fromTo(
-          doorFourTextRef.current,
-          { opacity: 0, y: 24 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.3,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: doorFourRef.current,
-              start: "top 78%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      }
-
-      revealDoor(doorFiveRef.current, [doorFiveEyebrowRef.current, doorFiveTitleRef.current]);
+      revealScreen(invitationRef.current, [
+        invitationEyebrowRef.current,
+        invitationTitleRef.current,
+        invitationBodyRef.current,
+      ]);
     }, heroRef);
 
     return () => ctx.revert();
   }, []);
+
+  const scrollToInvitation = () => {
+    invitationRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Give the smooth scroll time to finish, then place the cursor
+    // straight into the email field so the action feels immediate.
+    window.setTimeout(() => {
+      emailInputRef.current?.focus();
+    }, 700);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -228,29 +232,27 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen ${bg} ${text} selection:bg-onyx selection:text-platine relative flex flex-col font-sans transition-colors duration-700`}>
-      {/* MARQUEE BAR — scrolls right to left, sits above the navbar */}
+      {/* MARQUEE 1 — "Where Beauty Reigns", left to right */}
       <div
         className={`fixed top-0 left-0 w-full z-50 overflow-hidden h-8 flex items-center ${
           isDark ? "bg-platine text-onyx" : "bg-onyx text-platine"
         } transition-colors duration-700`}
       >
-        <div className="flex whitespace-nowrap animate-marquee">
+        <div className="flex whitespace-nowrap animate-marquee-ltr">
           {Array.from({ length: 2 }).map((_, groupIdx) => (
             <div key={groupIdx} className="flex shrink-0">
               {Array.from({ length: 8 }).map((_, i) => (
-                <span
-                  key={i}
-                  className="mx-12 text-[10px] uppercase tracking-[0.35em] font-medium"
-                >
-                  Where Beauty Reigns
+                <span key={i} className="mx-12 text-[10px] uppercase tracking-[0.35em] font-medium">
+                  Where Beauty Reigns.
                 </span>
               ))}
             </div>
           ))}
         </div>
       </div>
+
       <style jsx>{`
-        @keyframes marquee {
+        @keyframes marquee-rtl {
           0% {
             transform: translateX(0);
           }
@@ -258,8 +260,19 @@ export default function Home() {
             transform: translateX(-50%);
           }
         }
-        .animate-marquee {
-          animation: marquee 45s linear infinite;
+        @keyframes marquee-ltr {
+          0% {
+            transform: translateX(-50%);
+          }
+          100% {
+            transform: translateX(0);
+          }
+        }
+        .animate-marquee-rtl {
+          animation: marquee-rtl 45s linear infinite;
+        }
+        .animate-marquee-ltr {
+          animation: marquee-ltr 45s linear infinite;
         }
       `}</style>
 
@@ -303,11 +316,11 @@ export default function Home() {
         </button>
       </nav>
 
-      {/* HERO */}
+      {/* SCREEN 1 — THE ARRIVAL */}
       <section
-        id="hero"
+        id="arrival"
         ref={heroRef}
-        className="relative h-screen min-h-[650px] w-full flex flex-col items-center justify-between overflow-hidden px-6 pt-24 md:pt-28 pb-12 md:pb-20"
+        className="relative h-screen min-h-[650px] w-full flex flex-col items-center justify-center overflow-hidden px-6 pt-24 md:pt-28 pb-12"
       >
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div
@@ -322,14 +335,8 @@ export default function Home() {
           />
         </div>
 
-        <div className="z-10 flex flex-col items-center gap-3">
-          <div className="text-[10px] uppercase tracking-[0.25em] text-graphite font-medium">
-            THE ENTRANCE
-          </div>
-        </div>
-
-        <div className="z-10 w-full max-w-4xl text-center flex flex-col items-center justify-center my-auto">
-          <div ref={wordmarkRef} className="overflow-hidden select-none mb-4 md:mb-6 opacity-0">
+        <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
+          <div ref={wordmarkRef} className="overflow-hidden select-none mb-6 opacity-0">
             <Image
               src="/logo-text.png"
               alt="VOANIQUÉ"
@@ -342,137 +349,261 @@ export default function Home() {
 
           <div
             ref={hairlineRef}
-            className="w-full max-w-sm sm:max-w-md h-[1px] bg-graphite bg-opacity-30 mb-8 md:mb-10 scale-x-0 origin-center"
+            className="w-full max-w-sm h-[1px] bg-graphite bg-opacity-30 mb-8 scale-x-0 origin-center"
           />
 
           <p
             ref={taglineRef}
-            className={`text-xl sm:text-2xl md:text-3xl font-serif italic ${headingText} tracking-wide opacity-0 max-w-2xl`}
+            className={`text-xl sm:text-2xl md:text-3xl font-serif italic ${headingText} tracking-wide opacity-0 max-w-xl leading-snug`}
+          >
+            Where Beauty Reigns.
+            <br />
+            It Begins With Your Lips.
+          </p>
+
+          <p
+            ref={heroSubRef}
+            className="text-sm sm:text-base text-graphite opacity-0 mt-6 max-w-md leading-relaxed"
           >
             A new luxury beauty house is preparing to open its doors.
           </p>
-        </div>
 
+          <div ref={heroCtaRef} className="opacity-0 mt-10">
+            <button
+              type="button"
+              onClick={scrollToInvitation}
+              className={`${ctaButton} px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300`}
+            >
+              Request Your Invitation
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* MARQUEE 2 — "Luxury Lip Plumping Treatment", right to left — sits below the hero, in normal flow */}
+      <div
+        className={`w-full overflow-hidden h-10 flex items-center border-t border-b ${
+          isDark ? "bg-onyx text-argent border-white/10" : "bg-argent/20 text-graphite border-black/5"
+        } transition-colors duration-700`}
+      >
+        <div className="flex whitespace-nowrap animate-marquee-rtl">
+          {Array.from({ length: 2 }).map((_, groupIdx) => (
+            <div key={groupIdx} className="flex shrink-0">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <span key={i} className="mx-12 text-[10px] uppercase tracking-[0.35em] font-medium">
+                  Luxury Lip Plumping Treatment.
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SCREEN 2 — OUR BELIEF */}
+      <section
+        id="our-belief"
+        ref={beliefRef}
+        className={`relative w-full overflow-hidden px-6 py-36 md:py-56 border-t ${border}`}
+      >
+        {/* Atmospheric watermark, purely textural, sits behind everything */}
         <div
-          ref={scrollCueRef}
-          className="z-10 text-[10px] uppercase tracking-[0.3em] text-graphite opacity-0 flex flex-col items-center gap-2"
+          aria-hidden="true"
+          className={`pointer-events-none select-none absolute inset-0 flex items-center justify-center font-serif italic ${
+            isDark ? "text-white/[0.03]" : "text-black/[0.035]"
+          } text-[26vw] leading-none whitespace-nowrap`}
         >
-          <span>Enter</span>
-          <span className="block w-[1px] h-8 bg-graphite bg-opacity-40" />
+          Belief
+        </div>
+
+        <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center text-center gap-10">
+          <div ref={beliefEyebrowRef} className="text-[11px] uppercase tracking-[0.35em] text-graphite font-medium">
+            Our Belief
+          </div>
+
+          <h2
+            ref={beliefTitleRef}
+            className={`text-4xl sm:text-5xl md:text-6xl font-serif italic ${headingText} leading-[1.15] max-w-xl`}
+          >
+            Refinement Begins
+            <br />
+            With Intention.
+          </h2>
+
+          <div ref={beliefBodyRef} className="w-full flex flex-col items-center gap-10">
+            <div className="flex flex-col gap-2">
+              <p className="text-sm sm:text-base text-graphite leading-loose">
+                We believe beauty is rarely defined by one perfect feature.
+              </p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">
+                It is revealed through thoughtful choices.
+              </p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">Quiet details.</p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">Intentional living.</p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">
+                And the confidence to embrace what is already yours.
+              </p>
+            </div>
+
+            <div className={`w-16 h-[1px] ${isDark ? "bg-platine/25" : "bg-onyx/15"}`} />
+
+            <div className="flex flex-col gap-2">
+              <p className="text-sm sm:text-base text-graphite leading-loose">
+                Because true luxury is not created through excess.
+              </p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">It lives in restraint.</p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">In craftsmanship.</p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">In intention.</p>
+            </div>
+
+            <p className={`text-xl sm:text-2xl font-serif italic ${headingText} leading-snug max-w-md pt-2`}>
+              After all, the smallest details often leave the most lasting
+              impression.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* DOOR ONE — The Belief */}
+      {/* SCREEN 3 — WHY LIPS */}
       <section
-        id="door-one"
-        ref={doorOneRef}
-        className="w-full max-w-3xl mx-auto px-6 py-32 md:py-44 flex flex-col items-center text-center gap-6"
+        id="why-lips"
+        ref={whyLipsRef}
+        className={`relative w-full overflow-hidden px-6 py-36 md:py-56 border-t ${border}`}
       >
-        <div ref={doorOneEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-          · The Belief
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none select-none absolute inset-0 flex items-center justify-center font-serif italic ${
+            isDark ? "text-white/[0.03]" : "text-black/[0.035]"
+          } text-[26vw] leading-none whitespace-nowrap`}
+        >
+          Lips
         </div>
-        <h2 ref={doorOneTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-snug`}>
-          We believe beauty is intentional.
-          <br />
-          Considered. Never rushed.
-        </h2>
-        <p ref={doorOneLineRef} className="text-sm sm:text-base text-graphite max-w-md leading-relaxed">
-          This is where the House begins — not with a product, but with a
-          belief it intends to keep.
-        </p>
+
+        <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center text-center gap-10">
+          <div ref={whyLipsEyebrowRef} className="text-[11px] uppercase tracking-[0.35em] text-graphite font-medium">
+            Why Lips
+          </div>
+
+          <h2
+            ref={whyLipsTitleRef}
+            className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-[1.2] max-w-lg`}
+          >
+            Among the many features that shape a face, the lips hold a
+            quiet influence.
+          </h2>
+
+          <div ref={whyLipsBodyRef} className="w-full flex flex-col items-center gap-10">
+            <div className="flex flex-col gap-2">
+              <p className="text-sm sm:text-base text-graphite leading-loose">They frame every smile.</p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">Every word.</p>
+              <p className="text-sm sm:text-base text-graphite leading-loose">Every expression.</p>
+            </div>
+
+            <div className={`w-16 h-[1px] ${isDark ? "bg-platine/25" : "bg-onyx/15"}`} />
+
+            <p className="text-sm sm:text-base text-graphite leading-loose max-w-sm">
+              Long before you speak, they have already shaped the
+              impression you leave.
+            </p>
+
+            <p className={`text-xl sm:text-2xl font-serif italic ${headingText} leading-snug pt-2`}>
+              That is why our story begins here.
+            </p>
+          </div>
+        </div>
       </section>
 
-      {/* DOOR TWO — Why Lips Matter */}
+      {/* SCREEN 4 — OUR FIRST CREATION */}
       <section
-        id="door-two"
-        ref={doorTwoRef}
-        className={`w-full max-w-3xl mx-auto px-6 py-32 md:py-44 flex flex-col items-center text-center gap-6 border-t ${border}`}
-      >
-        <div ref={doorTwoEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-          · Why Lips Matter
-        </div>
-        <h2 ref={doorTwoTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif italic ${headingText} leading-snug`}>
-          Lips are where confidence begins.
-        </h2>
-        <p ref={doorTwoLineRef} className="text-sm sm:text-base text-graphite max-w-md leading-relaxed">
-          Where a feeling becomes visible. It's why the House chose to begin
-          exactly here.
-        </p>
-      </section>
-
-      {/* DOOR THREE — The First Creation */}
-      <section
-        id="door-three"
-        ref={doorThreeRef}
+        id="our-first-creation"
+        ref={firstCreationRef}
         className={`w-full max-w-5xl mx-auto px-6 py-32 md:py-44 border-t ${border}`}
       >
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
           <div className="flex-1 text-center md:text-left flex flex-col gap-5">
-            <div ref={doorThreeEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-              · The First Creation
+            <div
+              ref={firstCreationEyebrowRef}
+              className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium"
+            >
+              Our First Creation
             </div>
-            <h2 ref={doorThreeTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-snug`}>
-              Our First Creation:
-              <br />a luxury lip treatment.
+            <h2 ref={firstCreationTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-snug`}>
+              Every House has a beginning.
+              <br />
+              Ours begins with the lips.
             </h2>
-            <p ref={doorThreeLineRef} className="text-sm sm:text-base text-graphite max-w-sm mx-auto md:mx-0 leading-relaxed">
-              Fuller-looking lips in 10 minutes. The first door the House
-              opens — not the last.
+            <p ref={firstCreationBodyRef} className="text-sm sm:text-base text-graphite max-w-sm mx-auto md:mx-0 leading-loose">
+              Our First Creation is a luxury lip treatment, created to
+              visibly plump the lips in as little as ten minutes while
+              deeply nourishing and refining one of the face&apos;s most
+              expressive features.
+              <br />
+              <br />
+              Thoughtfully crafted as the First Creation of the House.
             </p>
           </div>
 
           <div
-            ref={doorThreeImageRef}
+            ref={firstCreationImageRef}
             className="flex-1 w-full aspect-[4/5] rounded-sm bg-gradient-to-br from-argent/40 via-platine to-graphite/20 border border-argent border-opacity-30"
             aria-hidden="true"
           />
         </div>
       </section>
 
-      {/* DOOR FOUR — Why You Can Trust the House (the single dark moment, always) */}
-      <section id="door-four" ref={doorFourRef} className="w-full bg-onyx text-platine overflow-hidden">
-        <div className="w-full max-w-4xl mx-auto px-6 py-36 md:py-48 text-center flex flex-col items-center justify-center gap-6">
-          <div className="text-[11px] uppercase tracking-[0.3em] text-argent font-medium">
-            · Why You Can Trust the House
-          </div>
-          <h2 ref={doorFourTextRef} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-tight max-w-3xl opacity-0">
-            Real photography. Honest ingredients. Nothing hidden.
-            <br />
-            <span className="font-bold">This is how the House will always work.</span>
-          </h2>
-        </div>
-      </section>
-
-      {/* DOOR FIVE — The Invitation */}
+      {/* SCREEN 5 — THE INVITATION */}
       <section
-        id="door-five"
-        ref={doorFiveRef}
-        className="w-full max-w-2xl mx-auto px-6 py-32 md:py-44 flex flex-col items-center text-center gap-8"
+        id="the-invitation"
+        ref={invitationRef}
+        className={`w-full max-w-2xl mx-auto px-6 py-32 md:py-44 flex flex-col items-center text-center gap-8 border-t ${border}`}
       >
         <div className="flex flex-col items-center gap-4">
-          <div ref={doorFiveEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-            · The Invitation
+          <div
+            ref={invitationEyebrowRef}
+            className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium"
+          >
+            The Invitation
           </div>
-          <h2 ref={doorFiveTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif italic ${headingText}`}>
-            Step inside.
+          <h2 ref={invitationTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif italic ${headingText}`}>
+            The House is preparing to open its doors.
           </h2>
+          <p ref={invitationBodyRef} className="text-sm sm:text-base text-graphite max-w-md leading-relaxed">
+            Request your invitation and be among the first to experience the
+            world of VOANIQUÉ.
+          </p>
         </div>
 
         <div className="w-full max-w-md mx-auto">
           {isSubmitted ? (
             <div ref={successSectionRef} className="text-center opacity-0 flex flex-col items-center justify-center py-4">
-              <div className={`w-10 h-10 rounded-full border ${isDark ? "border-platine" : "border-onyx"} flex items-center justify-center mb-4`}>
+              <div className={`w-10 h-10 rounded-full border ${isDark ? "border-platine" : "border-onyx"} flex items-center justify-center mb-5`}>
                 <Check className={`w-4 h-4 ${headingText} stroke-[1.5]`} />
               </div>
 
-              <h3 className={`text-2xl sm:text-3xl font-serif ${headingText} mb-3 tracking-tight`}>
-                {alreadyRegistered ? "You're already inside." : "Welcome to the House."}
+              <h3 className={`text-2xl sm:text-3xl font-serif ${headingText} mb-4 tracking-tight`}>
+                Welcome to the House.
               </h3>
 
-              <p className="text-sm text-graphite leading-relaxed max-w-sm mx-auto">
-                {alreadyRegistered
-                  ? "Your invitation was already received. We'll let you know the moment the doors open."
-                  : "Your invitation has been received. We'll let you know the moment the doors open."}
+              <p className="text-sm text-graphite leading-loose max-w-sm mx-auto">
+                Your invitation has been received.
+                <br />
+                <br />
+                Before you go, we would like you to remember one thing.
+                <br />
+                <br />
+                You have never needed permission to be beautiful.
+                <br />
+                <br />
+                We hope you will always appreciate the beauty that is
+                already yours while embracing the quiet rituals that help
+                it flourish.
+                <br />
+                <br />
+                We are honored to welcome you.
+                <br />
+                <br />
+                Refinement Begins With Intention.
+                <br />
+                The House of VOANIQUÉ
               </p>
             </div>
           ) : (
@@ -485,13 +616,14 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <input
                       id="email-input"
+                      ref={emailInputRef}
                       type="email"
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);
                         if (error) setError(null);
                       }}
-                      placeholder="ENTER EMAIL ADDRESS"
+                      placeholder="EMAIL ADDRESS"
                       disabled={loading}
                       required
                       className={`flex-grow px-5 py-4 border border-argent text-xs sm:text-sm tracking-wider uppercase ${inputBg} focus:outline-none focus:ring-2 focus:ring-onyx transition-all duration-300 font-mono ${headingText} h-14`}
@@ -499,9 +631,9 @@ export default function Home() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`${ctaButton} px-6 py-4 text-xs font-semibold tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-2 disabled:bg-opacity-50 disabled:cursor-not-allowed h-14 shrink-0`}
+                      className={`${ctaButton} px-6 py-4 text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:bg-opacity-50 disabled:cursor-not-allowed h-14 shrink-0`}
                     >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "REQUEST AN INVITATION"}
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Request Your Invitation"}
                     </button>
                   </div>
 
@@ -509,10 +641,9 @@ export default function Home() {
                 </div>
 
                 <p className="text-[10px] text-graphite leading-relaxed text-center">
-                  Be among the first to enter, when the House opens its
-                  doors. By joining, you consent to receive early
-                  invitations, opening announcements, and future VOANIQUÉ
-                  updates. We value your privacy; unsubscribe at any time.
+                  By joining, you consent to receive early invitations,
+                  opening announcements, and future VOANIQUÉ updates. We
+                  value your privacy. Unsubscribe at any time.
                 </p>
               </form>
             </div>
