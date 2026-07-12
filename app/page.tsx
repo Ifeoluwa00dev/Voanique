@@ -56,12 +56,11 @@ export default function Home() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // --- Hero intro ---
-      const wordmarkChars = wordmarkRef.current?.querySelectorAll(".wordmark-char");
-      if (wordmarkChars && wordmarkChars.length > 0) {
+      if (wordmarkRef.current) {
         gsap.fromTo(
-          wordmarkChars,
-          { yPercent: 105, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 1.4, ease: "power3.out", stagger: 0.08 }
+          wordmarkRef.current,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 1.3, ease: "power3.out" }
         );
       }
       if (hairlineRef.current) {
@@ -290,19 +289,20 @@ export default function Home() {
 
         <div className="z-10 flex flex-col items-center gap-3">
           <div className="text-[10px] uppercase tracking-[0.25em] text-graphite font-medium">
-            THE ENTRANCE
+            
           </div>
         </div>
 
         <div className="z-10 w-full max-w-4xl text-center flex flex-col items-center justify-center my-auto">
-          <div ref={wordmarkRef} className="overflow-hidden select-none mb-4 md:mb-6">
-            <h1 className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-serif font-medium tracking-[0.05em] ${headingText} inline-flex`}>
-              {"VOANIQUÉ".split("").map((char, index) => (
-                <span key={index} className="wordmark-char inline-block">
-                  {char}
-                </span>
-              ))}
-            </h1>
+          <div ref={wordmarkRef} className="overflow-hidden select-none mb-4 md:mb-6 opacity-0">
+            <Image
+              src="/logo-text.png"
+              alt="VOANIQUÉ"
+              width={640}
+              height={160}
+              priority
+              className={`w-auto h-16 sm:h-20 md:h-28 lg:h-32 mx-auto ${isDark ? "invert" : ""}`}
+            />
           </div>
 
           <div
@@ -334,7 +334,7 @@ export default function Home() {
         className="w-full max-w-3xl mx-auto px-6 py-32 md:py-44 flex flex-col items-center text-center gap-6"
       >
         <div ref={doorOneEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-          Door One · The Belief
+          · The Belief
         </div>
         <h2 ref={doorOneTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-snug`}>
           We believe beauty is intentional.
@@ -354,7 +354,7 @@ export default function Home() {
         className={`w-full max-w-3xl mx-auto px-6 py-32 md:py-44 flex flex-col items-center text-center gap-6 border-t ${border}`}
       >
         <div ref={doorTwoEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-          Door Two · Why Lips Matter
+          · Why Lips Matter
         </div>
         <h2 ref={doorTwoTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif italic ${headingText} leading-snug`}>
           Lips are where confidence begins.
@@ -374,7 +374,7 @@ export default function Home() {
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
           <div className="flex-1 text-center md:text-left flex flex-col gap-5">
             <div ref={doorThreeEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-              Door Three · The First Creation
+              · The First Creation
             </div>
             <h2 ref={doorThreeTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-snug`}>
               Our First Creation:
@@ -398,7 +398,7 @@ export default function Home() {
       <section id="door-four" ref={doorFourRef} className="w-full bg-onyx text-platine overflow-hidden">
         <div className="w-full max-w-4xl mx-auto px-6 py-36 md:py-48 text-center flex flex-col items-center justify-center gap-6">
           <div className="text-[11px] uppercase tracking-[0.3em] text-argent font-medium">
-            Door Four · Why You Can Trust the House
+            · Why You Can Trust the House
           </div>
           <h2 ref={doorFourTextRef} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-tight max-w-3xl opacity-0">
             Real photography. Honest ingredients. Nothing hidden.
@@ -416,7 +416,7 @@ export default function Home() {
       >
         <div className="flex flex-col items-center gap-4">
           <div ref={doorFiveEyebrowRef} className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
-            Door Five · The Invitation
+            · The Invitation
           </div>
           <h2 ref={doorFiveTitleRef} className={`text-3xl sm:text-4xl md:text-5xl font-serif italic ${headingText}`}>
             Step inside.
