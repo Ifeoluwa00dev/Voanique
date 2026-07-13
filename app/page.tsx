@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, FormEvent } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Check, Loader2, Sun, Moon } from "lucide-react";
+import { Check, Loader2, Sun, Moon, X } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -161,14 +161,10 @@ export default function Home() {
     return () => ctx.revert();
   }, []);
 
-  const scrollToInvitation = () => {
-    invitationRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    // Give the smooth scroll time to finish, then place the cursor
-    // straight into the email field so the action feels immediate.
-    window.setTimeout(() => {
-      emailInputRef.current?.focus();
-    }, 700);
-  };
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  const openRequestModal = () => setShowRequestModal(true);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -195,6 +191,8 @@ export default function Home() {
       if (response.ok && data.success) {
         setAlreadyRegistered(!!data.alreadyRegistered);
         setIsSubmitted(true);
+        setShowRequestModal(false);
+        setShowWelcomeModal(true);
 
         setTimeout(() => {
           if (successSectionRef.current) {
@@ -221,8 +219,8 @@ export default function Home() {
   const headingText = isDark ? "text-platine" : "text-onyx";
   const border = "border-argent border-opacity-20";
   const heroOverlay = isDark
-    ? "linear-gradient(rgba(23,24,26,0.75), rgba(23,24,26,0.85))"
-    : "linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.75))";
+    ? "linear-gradient(rgba(23,24,26,0.6), rgba(23,24,26,0.78))"
+    : "linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0.68))";
   const inputBg = isDark
     ? "bg-white/5 focus:bg-white/10 placeholder:text-argent/60"
     : "bg-white/60 focus:bg-white placeholder:text-graphite/60";
@@ -327,9 +325,9 @@ export default function Home() {
             ref={heroBgRef}
             className="absolute -top-[10%] left-0 w-full h-[120%] opacity-90"
             style={{
-              backgroundImage: `${heroOverlay}, url('https://images.unsplash.com/photo-1631237534324-4b961b17b424?fm=jpg&q=80&w=2400&auto=format&fit=crop')`,
+              backgroundImage: `${heroOverlay}, url('/portrait.jpg')`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
+              backgroundPosition: "center 25%",
               backgroundColor: isDark ? "#17181A" : "#FAFAF9",
             }}
           />
@@ -371,7 +369,7 @@ export default function Home() {
           <div ref={heroCtaRef} className="opacity-0 mt-10">
             <button
               type="button"
-              onClick={scrollToInvitation}
+              onClick={openRequestModal}
               className={`${ctaButton} px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300`}
             >
               Request Your Invitation
@@ -467,47 +465,51 @@ export default function Home() {
       <section
         id="why-lips"
         ref={whyLipsRef}
-        className={`relative w-full overflow-hidden px-6 py-36 md:py-56 border-t ${border}`}
+        className={`w-full border-t ${border}`}
       >
-        <div
-          aria-hidden="true"
-          className={`pointer-events-none select-none absolute inset-0 flex items-center justify-center font-serif italic ${
-            isDark ? "text-white/[0.03]" : "text-black/[0.035]"
-          } text-[26vw] leading-none whitespace-nowrap`}
-        >
-          Lips
-        </div>
-
-        <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center text-center gap-10">
-          <div ref={whyLipsEyebrowRef} className="text-[11px] uppercase tracking-[0.35em] text-graphite font-medium">
-            Why Lips
+        <div className="flex flex-col md:flex-row md:min-h-[85vh]">
+          {/* Image — same portrait, cropped tighter to the lips for a distinct moment */}
+          <div className="relative w-full md:w-1/2 aspect-[4/5] md:aspect-auto overflow-hidden">
+            <Image
+              src="/portrait.jpg"
+              alt="A close, considered study of the lips"
+              fill
+              className="object-cover object-[center_65%]"
+            />
           </div>
 
-          <h2
-            ref={whyLipsTitleRef}
-            className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-[1.2] max-w-lg`}
-          >
-            Among the many features that shape a face, the lips hold a
-            quiet influence.
-          </h2>
-
-          <div ref={whyLipsBodyRef} className="w-full flex flex-col items-center gap-10">
-            <div className="flex flex-col gap-2">
-              <p className="text-sm sm:text-base text-graphite leading-loose">They frame every smile.</p>
-              <p className="text-sm sm:text-base text-graphite leading-loose">Every word.</p>
-              <p className="text-sm sm:text-base text-graphite leading-loose">Every expression.</p>
+          {/* Text */}
+          <div className="w-full md:w-1/2 flex flex-col items-center justify-center text-center gap-8 px-6 py-20 md:py-24">
+            <div ref={whyLipsEyebrowRef} className="text-[11px] uppercase tracking-[0.35em] text-graphite font-medium">
+              Why Lips
             </div>
 
-            <div className={`w-16 h-[1px] ${isDark ? "bg-platine/25" : "bg-onyx/15"}`} />
+            <h2
+              ref={whyLipsTitleRef}
+              className={`text-3xl sm:text-4xl md:text-5xl font-serif ${headingText} leading-[1.2] max-w-md`}
+            >
+              Among the many features that shape a face, the lips hold a
+              quiet influence.
+            </h2>
 
-            <p className="text-sm sm:text-base text-graphite leading-loose max-w-sm">
-              Long before you speak, they have already shaped the
-              impression you leave.
-            </p>
+            <div ref={whyLipsBodyRef} className="w-full flex flex-col items-center gap-8">
+              <div className="flex flex-col gap-2">
+                <p className="text-sm sm:text-base text-graphite leading-loose">They frame every smile.</p>
+                <p className="text-sm sm:text-base text-graphite leading-loose">Every word.</p>
+                <p className="text-sm sm:text-base text-graphite leading-loose">Every expression.</p>
+              </div>
 
-            <p className={`text-xl sm:text-2xl font-serif italic ${headingText} leading-snug pt-2`}>
-              That is why our story begins here.
-            </p>
+              <div className={`w-16 h-[1px] ${isDark ? "bg-platine/25" : "bg-onyx/15"}`} />
+
+              <p className="text-sm sm:text-base text-graphite leading-loose max-w-sm">
+                Long before you speak, they have already shaped the
+                impression you leave.
+              </p>
+
+              <p className={`text-xl sm:text-2xl font-serif italic ${headingText} leading-snug pt-2`}>
+                That is why our story begins here.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -544,9 +546,15 @@ export default function Home() {
 
           <div
             ref={firstCreationImageRef}
-            className="flex-1 w-full aspect-[4/5] rounded-sm bg-gradient-to-br from-argent/40 via-platine to-graphite/20 border border-argent border-opacity-30"
-            aria-hidden="true"
-          />
+            className="relative flex-1 w-full max-w-sm md:max-w-none aspect-[2/3] md:aspect-[3/4] rounded-sm overflow-hidden border border-argent border-opacity-30"
+          >
+            <Image
+              src="/before-after-result.jpg"
+              alt="Before, after, and the VOANIQUÉ effect on the lips"
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 
@@ -579,31 +587,12 @@ export default function Home() {
                 <Check className={`w-4 h-4 ${headingText} stroke-[1.5]`} />
               </div>
 
-              <h3 className={`text-2xl sm:text-3xl font-serif ${headingText} mb-4 tracking-tight`}>
-                Welcome to the House.
+              <h3 className={`text-xl sm:text-2xl font-serif ${headingText} mb-2 tracking-tight`}>
+                {alreadyRegistered ? "You're already inside." : "Your invitation has been received."}
               </h3>
 
-              <p className="text-sm text-graphite leading-loose max-w-sm mx-auto">
-                Your invitation has been received.
-                <br />
-                <br />
-                Before you go, we would like you to remember one thing.
-                <br />
-                <br />
-                You have never needed permission to be beautiful.
-                <br />
-                <br />
-                We hope you will always appreciate the beauty that is
-                already yours while embracing the quiet rituals that help
-                it flourish.
-                <br />
-                <br />
-                We are honored to welcome you.
-                <br />
-                <br />
-                Refinement Begins With Intention.
-                <br />
-                The House of VOANIQUÉ
+              <p className="text-sm text-graphite leading-relaxed max-w-sm mx-auto">
+                We'll let you know the moment the doors open.
               </p>
             </div>
           ) : (
@@ -641,9 +630,11 @@ export default function Home() {
                 </div>
 
                 <p className="text-[10px] text-graphite leading-relaxed text-center">
-                  By joining, you consent to receive early invitations,
-                  opening announcements, and future VOANIQUÉ updates. We
-                  value your privacy. Unsubscribe at any time.
+                  By requesting your invitation, you agree to receive
+                  opening announcements, early access invitations,
+                  exclusive House updates, and occasional correspondence
+                  from the House of VOANIQUÉ. We value your privacy, and
+                  you may unsubscribe at any time.
                 </p>
               </form>
             </div>
@@ -666,6 +657,125 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* REQUEST MODAL — triggered from the hero button */}
+      {showRequestModal && !isSubmitted && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center px-6"
+          onClick={() => setShowRequestModal(false)}
+        >
+          <div className={`absolute inset-0 ${isDark ? "bg-black/60" : "bg-onyx/40"} backdrop-blur-sm`} />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`relative w-full max-w-md ${bg} border ${border} p-8 md:p-10 flex flex-col items-center text-center gap-6 transition-colors duration-700`}
+          >
+            <button
+              type="button"
+              onClick={() => setShowRequestModal(false)}
+              aria-label="Close"
+              className="absolute top-4 right-4 text-graphite hover:opacity-70 transition-opacity"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-[11px] uppercase tracking-[0.3em] text-graphite font-medium">
+              The Invitation
+            </div>
+            <h3 className={`text-2xl sm:text-3xl font-serif italic ${headingText}`}>
+              Step inside.
+            </h3>
+
+            <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
+              <label htmlFor="modal-email-input" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="modal-email-input"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder="EMAIL ADDRESS"
+                disabled={loading}
+                required
+                className={`w-full px-5 py-4 border border-argent text-xs sm:text-sm tracking-wider uppercase ${inputBg} focus:outline-none focus:ring-2 focus:ring-onyx transition-all duration-300 font-mono ${headingText} h-14`}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className={`${ctaButton} px-6 py-4 text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:bg-opacity-50 disabled:cursor-not-allowed h-14`}
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Request Your Invitation"}
+              </button>
+              {error && <p className="text-xs text-red-600 font-medium tracking-wide">{error}</p>}
+            </form>
+
+            <p className="text-[10px] text-graphite leading-relaxed">
+              By requesting your invitation, you agree to receive opening
+              announcements, early access invitations, exclusive House
+              updates, and occasional correspondence from the House of
+              VOANIQUÉ. We value your privacy, and you may unsubscribe at
+              any time.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* WELCOME MODAL — pops up the moment a request succeeds, from either entry point */}
+      {showWelcomeModal && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center px-6"
+          onClick={() => setShowWelcomeModal(false)}
+        >
+          <div className={`absolute inset-0 ${isDark ? "bg-black/60" : "bg-onyx/40"} backdrop-blur-sm`} />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`relative w-full max-w-lg ${bg} border ${border} p-8 md:p-12 flex flex-col items-center text-center gap-5 max-h-[85vh] overflow-y-auto transition-colors duration-700`}
+          >
+            <button
+              type="button"
+              onClick={() => setShowWelcomeModal(false)}
+              aria-label="Close"
+              className="absolute top-4 right-4 text-graphite hover:opacity-70 transition-opacity"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className={`w-10 h-10 rounded-full border ${isDark ? "border-platine" : "border-onyx"} flex items-center justify-center mb-1`}>
+              <Check className={`w-4 h-4 ${headingText} stroke-[1.5]`} />
+            </div>
+
+            <h3 className={`text-2xl sm:text-3xl font-serif ${headingText} tracking-tight`}>
+              Welcome to the House.
+            </h3>
+
+            <p className="text-sm text-graphite leading-loose max-w-sm mx-auto">
+              Your invitation has been received.
+              <br />
+              <br />
+              Before you go, we would like you to remember one thing.
+              <br />
+              <br />
+              You have never needed permission to be beautiful.
+              <br />
+              <br />
+              We hope you will always appreciate the beauty that is
+              already yours while embracing the quiet rituals that help it
+              flourish.
+              <br />
+              <br />
+              We are honored to welcome you.
+              <br />
+              <br />
+              Refinement Begins With Intention.
+              <br />
+              The House of VOANIQUÉ
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
