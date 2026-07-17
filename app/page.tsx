@@ -194,6 +194,20 @@ export default function Home() {
         setShowRequestModal(false);
         setShowWelcomeModal(true);
 
+        // Track the actual conversion, not just the pageview.
+        // Only fires if the corresponding script loaded (i.e. an ID was configured).
+        if (!data.alreadyRegistered) {
+          if (typeof window !== "undefined" && (window as any).gtag) {
+            (window as any).gtag("event", "generate_lead", {
+              event_category: "waitlist",
+              event_label: "Request Your Invitation",
+            });
+          }
+          if (typeof window !== "undefined" && (window as any).fbq) {
+            (window as any).fbq("track", "Lead", { content_name: "Waitlist Signup" });
+          }
+        }
+
         setTimeout(() => {
           if (successSectionRef.current) {
             gsap.fromTo(
@@ -321,17 +335,17 @@ export default function Home() {
         className="relative h-screen min-h-[650px] w-full flex flex-col items-center justify-center overflow-hidden px-6 pt-24 md:pt-28 pb-12"
       >
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <div
-            ref={heroBgRef}
-            className="absolute -top-[10%] left-0 w-full h-[120%] opacity-90"
-            style={{
-              backgroundImage: `${heroOverlay}, url('/portrait.jpg')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center 25%",
-              backgroundColor: isDark ? "#17181A" : "#FAFAF9",
-            }}
-          />
-        </div>
+  <div
+    ref={heroBgRef}
+    className="absolute -top-[10%] left-0 w-full h-[120%] opacity-90"
+    style={{
+      backgroundImage: `${heroOverlay}, url('/portrait.webp')`,
+      backgroundSize: "cover",
+      backgroundPosition: "center 25%",
+      backgroundColor: isDark ? "#17181A" : "#FAFAF9",
+    }}
+  />
+</div>
 
         <div className="z-10 w-full max-w-2xl text-center flex flex-col items-center">
           <div ref={wordmarkRef} className="overflow-hidden select-none mb-6 opacity-0">
@@ -471,7 +485,7 @@ export default function Home() {
           {/* Image — same portrait, cropped tighter to the lips for a distinct moment */}
           <div className="relative w-full md:w-1/2 aspect-[4/5] md:aspect-auto overflow-hidden">
             <Image
-              src="/portrait.jpg"
+              src="/portrait.webp"
               alt="A close, considered study of the lips"
               fill
               className="object-cover object-[center_65%]"
@@ -549,9 +563,10 @@ export default function Home() {
             className="relative flex-1 w-full max-w-sm md:max-w-none aspect-[2/3] md:aspect-[3/4] rounded-sm overflow-hidden border border-argent border-opacity-30"
           >
             <Image
-              src="/before-after-result.jpg"
+              src="/before-after-result.webp"
               alt="Before, after, and the VOANIQUÉ effect on the lips"
               fill
+              sizes="(max-width: 768px) 90vw, 40vw"
               className="object-cover"
             />
           </div>
