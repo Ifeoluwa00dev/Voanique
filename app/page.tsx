@@ -740,57 +740,69 @@ export default function Home() {
 
       {/* WELCOME MODAL — pops up the moment a request succeeds, from either entry point */}
       {showWelcomeModal && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center px-6"
-          onClick={() => setShowWelcomeModal(false)}
-        >
-          <div className={`absolute inset-0 ${isDark ? "bg-black/60" : "bg-onyx/40"} backdrop-blur-sm`} />
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className={`relative w-full max-w-lg ${bg} border ${border} p-8 md:p-12 flex flex-col items-center text-center gap-5 max-h-[85vh] overflow-y-auto transition-colors duration-700`}
-          >
-            <button
-              type="button"
-              onClick={() => setShowWelcomeModal(false)}
-              aria-label="Close"
-              className="absolute top-4 right-4 text-graphite hover:opacity-70 transition-opacity"
-            >
-              <X className="w-4 h-4" />
-            </button>
+  <div
+    className="fixed inset-0 z-[60] flex items-center justify-center px-6"
+    onClick={() => setShowWelcomeModal(false)}
+  >
+    <div className={`absolute inset-0 ${isDark ? "bg-black/60" : "bg-onyx/40"} backdrop-blur-sm`} />
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className={`relative w-full max-w-md ${bg} border ${border} px-8 py-12 md:px-12 md:py-14 flex flex-col items-center text-center max-h-[85vh] overflow-y-auto transition-colors duration-700`}
+    >
+      <button
+        type="button"
+        onClick={() => setShowWelcomeModal(false)}
+        aria-label="Close"
+        className="absolute top-5 right-5 text-graphite hover:opacity-70 transition-opacity"
+      >
+        <X className="w-4 h-4" strokeWidth={1.5} />
+      </button>
 
-            <div className={`w-10 h-10 rounded-full border ${isDark ? "border-platine" : "border-onyx"} flex items-center justify-center mb-1`}>
-              <Check className={`w-4 h-4 ${headingText} stroke-[1.5]`} />
-            </div>
+      {/* Monogram mark instead of generic checkmark */}
+      <div
+        className={`w-11 h-11 rounded-full border ${isDark ? "border-platine" : "border-onyx"} flex items-center justify-center mb-6`}
+      >
+        <span className={`font-serif text-base ${headingText} tracking-tight`}>V</span>
+      </div>
 
-            <h3 className={`text-2xl sm:text-3xl font-serif ${headingText} tracking-tight`}>
-              Welcome to the House.
-            </h3>
+      <span className="text-[10px] tracking-[0.25em] uppercase text-graphite mb-4">
+        The Invitation
+      </span>
 
-            <p className="text-sm text-graphite leading-loose max-w-sm mx-auto">
-              Your invitation has been received.
-              <br />
-              <br />
-              Before you go, we would like you to remember one thing.
-              <br />
-              <br />
-              You have never needed permission to be beautiful.
-              <br />
-              <br />
-              We hope you will always appreciate the beauty that is
-              already yours while embracing the quiet rituals that help it
-              flourish.
-              <br />
-              <br />
-              We are honored to welcome you.
-              <br />
-              <br />
-              Refinement Begins With Intention.
-              <br />
-              The House of VOANIQUÉ
-            </p>
-          </div>
-        </div>
-      )}
+      <h3 className={`text-2xl sm:text-3xl font-serif italic ${headingText} tracking-tight mb-7`}>
+        Welcome to the House.
+      </h3>
+
+      <p className="text-sm text-graphite leading-loose max-w-sm mx-auto">
+        Your invitation has been received.
+        <br />
+        <br />
+        Before you go, we would like you to remember one thing.
+      </p>
+
+      <p className={`text-sm italic ${headingText} leading-loose max-w-sm mx-auto mt-5`}>
+        You have never needed permission to be beautiful.
+      </p>
+
+      <p className="text-sm text-graphite leading-loose max-w-sm mx-auto mt-5">
+        We hope you will always appreciate the beauty that is already
+        yours while embracing the quiet rituals that help it flourish.
+        <br />
+        <br />
+        We are honored to welcome you.
+      </p>
+
+      <div className={`w-10 h-px ${isDark ? "bg-platine/40" : "bg-onyx/20"} my-7`} />
+
+      <p className={`text-sm italic ${headingText}`}>
+        Refinement Begins With Intention.
+      </p>
+      <p className="text-[10px] tracking-[0.2em] uppercase text-graphite mt-2">
+        The House of VOANIQUÉ
+      </p>
+    </div>
+  </div>
+)}
     </div>
   );
 }
